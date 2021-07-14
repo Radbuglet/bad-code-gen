@@ -1,3 +1,8 @@
+; Built on rustc version: `rustc 1.55.0-nightly (3e1c75c6e 2021-07-13)`
+; using `cargo clean && cargo rustc --release -- --emit asm`
+; Additional comments added by hand.
+
+; === Metadata
 	.text
 	.def	 @feat.00;
 	.scl	3;
@@ -6,64 +11,66 @@
 	.globl	@feat.00
 .set @feat.00, 0
 	.file	"bad_code_gen.1cb7e927-cgu.0"
-	.def	 _ZN36_$LT$T$u20$as$u20$core..any..Any$GT$7type_id17hdf7e39fdf5ab97b7E;
-	.scl	3;
-	.type	32;
-	.endef
-	.section	.text,"xr",one_only,_ZN36_$LT$T$u20$as$u20$core..any..Any$GT$7type_id17hdf7e39fdf5ab97b7E
-	.p2align	4, 0x90
-_ZN36_$LT$T$u20$as$u20$core..any..Any$GT$7type_id17hdf7e39fdf5ab97b7E:
-	movabsq	$-5596821061263218879, %rax
-	retq
 
-	.def	 _ZN4core3ptr24drop_in_place$LT$u32$GT$17h049ecb037a4ba0ddE;
-	.scl	3;
-	.type	32;
-	.endef
-	.section	.text,"xr",one_only,_ZN4core3ptr24drop_in_place$LT$u32$GT$17h049ecb037a4ba0ddE
-	.p2align	4, 0x90
-_ZN4core3ptr24drop_in_place$LT$u32$GT$17h049ecb037a4ba0ddE:
-	retq
+; === bad_code_gen::with_repr_c::works_correctly
+; Inlines "0xDEAD_BEEF == 0xDEAD_BEEF" check.
 
-	.def	 _ZN12bad_code_gen15works_correctly17h7c544f701055a5adE;
+	.def	 _ZN12bad_code_gen11with_repr_c15works_correctly17he253782477945fd7E;
 	.scl	2;
 	.type	32;
 	.endef
-	.section	.text,"xr",one_only,_ZN12bad_code_gen15works_correctly17h7c544f701055a5adE
-	.globl	_ZN12bad_code_gen15works_correctly17h7c544f701055a5adE
+	.section	.text,"xr",one_only,_ZN12bad_code_gen11with_repr_c15works_correctly17he253782477945fd7E
+	.globl	_ZN12bad_code_gen11with_repr_c15works_correctly17he253782477945fd7E
 	.p2align	4, 0x90
-_ZN12bad_code_gen15works_correctly17h7c544f701055a5adE:
+_ZN12bad_code_gen11with_repr_c15works_correctly17he253782477945fd7E:
+	.p2align	4, 0x90
+.LBB0_1:
+	jmp	.LBB0_1
+
+; === bad_code_gen::with_repr_c::broken
+; Checks "0xDEAD_BEEF" literal against const section in "__unnamed_1".
+
+	.def	 _ZN12bad_code_gen11with_repr_c6broken17h642bd50eef461598E;
+	.scl	2;
+	.type	32;
+	.endef
+	.section	.text,"xr",one_only,_ZN12bad_code_gen11with_repr_c6broken17h642bd50eef461598E
+	.globl	_ZN12bad_code_gen11with_repr_c6broken17h642bd50eef461598E
+	.p2align	4, 0x90
+_ZN12bad_code_gen11with_repr_c6broken17h642bd50eef461598E:
+	movl	$3735928559, %eax
+	cmpq	%rax, __unnamed_1(%rip)
+	jne	.LBB1_1
+	.p2align	4, 0x90
+.LBB1_2:
+	jmp	.LBB1_2
+.LBB1_1:
+	retq
+
+; === bad_code_gen::with_repr_c::broken_works_here
+; Inlines "0xDEAD_BEEF == 0xDEAD_BEEF" check.
+
+	.def	 _ZN12bad_code_gen14with_repr_rust17broken_works_here17h4a285a7e8b36f4c5E;
+	.scl	2;
+	.type	32;
+	.endef
+	.section	.text,"xr",one_only,_ZN12bad_code_gen14with_repr_rust17broken_works_here17h4a285a7e8b36f4c5E
+	.globl	_ZN12bad_code_gen14with_repr_rust17broken_works_here17h4a285a7e8b36f4c5E
+	.p2align	4, 0x90
+_ZN12bad_code_gen14with_repr_rust17broken_works_here17h4a285a7e8b36f4c5E:
 	.p2align	4, 0x90
 .LBB2_1:
 	jmp	.LBB2_1
 
-	.def	 _ZN12bad_code_gen6broken17hcc0e964ba9d7b34fE;
-	.scl	2;
-	.type	32;
-	.endef
-	.section	.text,"xr",one_only,_ZN12bad_code_gen6broken17hcc0e964ba9d7b34fE
-	.globl	_ZN12bad_code_gen6broken17hcc0e964ba9d7b34fE
-	.p2align	4, 0x90
-_ZN12bad_code_gen6broken17hcc0e964ba9d7b34fE:
-	movl	$3735928559, %eax
-	cmpq	%rax, __unnamed_1(%rip)
-	jne	.LBB3_1
-	.p2align	4, 0x90
-.LBB3_2:
-	jmp	.LBB3_2
-.LBB3_1:
-	retq
+; === Constants
 
+; "__unnamed_2" is likely the "MY_VALUE" constant
 	.section	.rdata,"dr",one_only,__unnamed_2
-	.p2align	3
 __unnamed_2:
-	.quad	_ZN4core3ptr24drop_in_place$LT$u32$GT$17h049ecb037a4ba0ddE
-	.asciz	"\004\000\000\000\000\000\000\000\004\000\000\000\000\000\000"
-	.quad	_ZN36_$LT$T$u20$as$u20$core..any..Any$GT$7type_id17hdf7e39fdf5ab97b7E
 
+; "__unnamed_1" is likely the "bad_code_gen::with_repr_c::FIELD" constant
 	.section	.rdata,"dr",one_only,__unnamed_1
 	.p2align	3
 __unnamed_1:
 	.asciz	"\357\276\255\336\000\000\000"
 	.quad	__unnamed_2
-
